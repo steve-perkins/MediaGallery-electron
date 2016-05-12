@@ -1,0 +1,23 @@
+{
+  "name": "MediaGallery",
+  "version": "1.0.0",
+  "description": "An Electron-based image and video viewer",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+TODO"
+  },
+  "keywords": [],
+  "author": "Steve Perkins",
+  "license": "MIT",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "devDependencies": {
+    "electron-prebuilt": "^1.0.1"
+  }
+}
