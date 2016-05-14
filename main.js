@@ -12,13 +12,6 @@ global.filename = process.argv[1] == "main.js" ? undefined : process.argv[1];
 // Global reference to the main window, so the garbage collector doesn't close it
 let mainWindow;
 
-// Passes log messages from the main process to the Dev Tools console in the renderer process
-function log(msg) {
-  mainWindow.webContents.on("did-finish-load", () => {
-    mainWindow.webContents.send("send-console", msg);
-  });
-}
-
 // Opens the main window, with a native menu bar
 function createWindow() {
   mainWindow = new BrowserWindow({width: 800, height: 600});
@@ -35,9 +28,8 @@ function createWindow() {
               filters: [
                 {name: "Images", extensions: ["jpg", "gif", "png"]},
                 {name: "Videos", extensions: ["mpg", "mpeg", "mp4"]}
-              ]}
-            );
-            log(`Opening file from menu: ${filenames[0]}`);
+              ]});
+            mainWindow.webContents.send("send-console", `Opening file from menu: ${filenames[0]}`);
           }
         },
         {
@@ -64,7 +56,9 @@ function createWindow() {
 // Call 'createWindow()' on startup
 app.on("ready", () => {
   createWindow();
-  log(`Opening file at startup: ${global.filename}`);
+  mainWindow.webContents.on("did-finish-load", () => {
+    mainWindow.webContents.send("send-console", `Opening file at startup: ${global.filename}`);
+  });
 });
 
 // On OS X it is common for applications and their menu bar to stay active until the user quits explicitly
