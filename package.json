@@ -4,7 +4,8 @@
   "description": "An Electron-based image and video viewer",
   "main": "main.js",
   "scripts": {
-    "start": "electron main.js"
+    "start": "electron main.js",
+    "build-win32-x64": "electron-packager . --platform=win32 --arch=x64 --overwrite"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,7 @@
   },
   "homepage": "",
   "devDependencies": {
-    "electron-prebuilt": "^1.0.1"
+    "electron-prebuilt": "^1.0.1",
+    "electron-packager": "^7.0.1"
   }
 }

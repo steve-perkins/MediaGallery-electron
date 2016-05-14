@@ -1,3 +1,14 @@
-// This file is required by the index.html file and will
-// be executed in the renderer process for that window.
-// All of the Node.js APIs are available in this process.
+// Block Electron from rendering a external file rather than the bundled web 
+// application, when a user drags that file into the Electron window.
+document.ondragover = document.ondrop = (event) => {
+  event.preventDefault();
+};
+document.body.ondrop = (event) => {
+  console.log(`Opening file from drag-n-drop: ${event.dataTransfer.files[0].path}`);
+  event.preventDefault();
+};
+
+require("electron").ipcRenderer.on("send-console", function(event, arg) {
+  console.log(arg);
+});
+

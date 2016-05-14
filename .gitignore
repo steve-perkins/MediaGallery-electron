@@ -1,1 +1,6 @@
+.idea
+MediaGallery.iml
+MediaGallery-win32-x64
 node_modules
+npm-debug.log
+
