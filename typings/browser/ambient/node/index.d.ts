@@ -2155,6 +2155,7 @@ declare module "tty" {
 declare module "domain" {
     import * as events from "events";
 
+    //noinspection JSAnnotator
     export class Domain extends events.EventEmitter implements NodeJS.Domain {
         run(fn: Function): void;
         add(emitter: events.EventEmitter): void;
