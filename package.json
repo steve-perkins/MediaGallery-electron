@@ -4,8 +4,10 @@
   "description": "An Electron-based image and video viewer",
   "main": "main.js",
   "scripts": {
+    "build": "tsc main.ts && tsc renderer.ts",
+    "prestart": "npm run build",
     "start": "electron main.js",
-    "build-win32-x64": "electron-packager . --platform=win32 --arch=x64 --overwrite"
+    "build-win32-x64": "npm run build && electron-packager . --platform=win32 --arch=x64 --overwrite"
   },
   "repository": {
     "type": "git",
@@ -20,6 +22,7 @@
   "homepage": "",
   "devDependencies": {
     "electron-prebuilt": "^1.0.1",
-    "electron-packager": "^7.0.1"
+    "electron-packager": "^7.0.1",
+    "typescript": "^1.8.10"
   }
 }
