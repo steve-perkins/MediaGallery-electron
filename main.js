@@ -4,11 +4,6 @@ const BrowserWindow = electron.BrowserWindow;
 const dialog = electron.dialog;
 const Menu = electron.Menu;
 
-// 'global.filename' holds the current image or video file to be worked with in the renderer process.  Files to open
-// can be passed as arguments to the executable at startup, drag-n-dropped on the window, or selected from the
-// 'File->Open' menu item.  This startup code checks for an argument passed to the executable.
-global.filename = process.argv[1] == "main.js" ? undefined : process.argv[1];
-
 // Global reference to the main window, so the garbage collector doesn't close it
 let mainWindow;
 
@@ -26,10 +21,11 @@ function createWindow() {
             let filenames = dialog.showOpenDialog({
               properties: ["openFile"],
               filters: [
+                {name: "All Media", extensions: ["jpg", "gif", "png", "mpg", "mpeg", "mp4"]},
                 {name: "Images", extensions: ["jpg", "gif", "png"]},
                 {name: "Videos", extensions: ["mpg", "mpeg", "mp4"]}
               ]});
-            mainWindow.webContents.send("send-console", `Opening file from menu: ${filenames[0]}`);
+            if (filenames && filenames[0]) mainWindow.webContents.send("load-file", filenames[0]);
           }
         },
         {
@@ -45,20 +41,21 @@ function createWindow() {
   Menu.setApplicationMenu(menu);
 
   mainWindow.loadURL(`file://${__dirname}/index.html`);
+  mainWindow.webContents.openDevTools();
 
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
-
-  mainWindow.webContents.openDevTools();
 }
 
 // Call 'createWindow()' on startup
 app.on("ready", () => {
   createWindow();
-  mainWindow.webContents.on("did-finish-load", () => {
-    mainWindow.webContents.send("send-console", `Opening file at startup: ${global.filename}`);
-  });
+  if (process.argv[1] != "main.js") {
+    mainWindow.webContents.on("did-finish-load", () => {
+      mainWindow.webContents.send("load-file", process.argv[1]);
+    });
+  }
 });
 
 // On OS X it is common for applications and their menu bar to stay active until the user quits explicitly

@@ -5,15 +5,11 @@
     <title>MediaGallery</title>
   </head>
   <body>
-  <script>
-    let remote = require("electron").remote;
-    let filename = remote.getGlobal("filename");
-    document.write(`Opening file at startup: ${filename}`);
-  </script>
+  <p>Selected file: <span id="selectedFile"/></p>
+  <p># of supported files in this directory: <span id="fileCount"/></p>
   </body>
 
   <script>
-    // You can also require other files to run in this process
     require('./renderer.js')
   </script>
 </html>
