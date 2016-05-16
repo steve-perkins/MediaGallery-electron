@@ -1,6 +1,6 @@
 .idea
 MediaGallery.iml
-MediaGallery-win32-x64
+dist
 node_modules
 npm-debug.log
 main.js

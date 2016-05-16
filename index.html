@@ -3,10 +3,17 @@
   <head>
     <meta charset="UTF-8">
     <title>MediaGallery</title>
+    <style>
+      #content {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+    </style>
   </head>
   <body>
-  <p>Selected file: <span id="selectedFile"/></p>
-  <p># of supported files in this directory: <span id="fileCount"/></p>
+  <div id="content"></div>
   </body>
 
   <script>
