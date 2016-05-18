@@ -24,53 +24,43 @@ So far I've already learned a handful of interesting quirks in Electron developm
 4. How to work with Node.js API's from within the renderer process, allowing your web application to
    escape the usual JavaScript security model constraints and interact directly with the native
    filesystem.
-5. How to use TypeScript instead of JavaScript for both the main and renderer process code... sorta.
-   This is a work in progress, see the notes in the next section.
+5. How to use TypeScript instead of JavaScript for both the main and renderer process code.
 
-Notes on TypeScript
--------------------
+Setup and Running
+-----------------
 
-At the time of this writing, there are very few simple examples online of mixing TypeScript with
-Electron, and none that are up to date.  So the current state of my code resulted from a lot of
-frustrating trial-and-error, and there is much about it that I don't fully understand.  I would LOVE
-any feedback and suggestions that others might offer!
+As prerequisites, this project requires Node.js and NPM to be installed, along with the TypeScript compiler (1.8+).
+If you don't already have TypeScript installed as a global NPM package, then run this command:
 
-* Unlike most examples that I've found online... I'm using the [typings](https://github.com/typings/typings)
-  definition manager (rather than the deprecated [tsd](http://definitelytyped.org/tsd/)) to install the
-  type definition files needed by TypeScript to understand Electron and Node.js imports.
+`npm install -g typescript`
 
-  * I ran the following console commands, from the root of this project structure:
+Now start by cloning this Git repository:
+
+`git clone https://github.com/steve-perkins/MediaGallery.git`
+
+... and running the following command from the project root directory:
+
+`npm install`
+
+At this point, you can build and launch the application with:
+
+`npm start`
+
+Development Notes
+-----------------
+
+The type definition files used by this project are managed by the "typings" TypeScript Definition Manager,
+version 1.0 or higher.  It is not necessary to have "typings" installed just to run this application.  However,
+if you want to develop on your own fork, and have the ability to update the type definitions, then you'll need
+to install "typings" as a global NPM module:
 
 `npm install -g typings`
 
-`typings install github-electron --ambient --save`
+The type definitions are committed to source control, as the `typings.json` file and the `typings` subdirectory.
+To get the latest type definitions, delete that file and subdirectory and replace them by running these two
+commands:
 
-`typings install node --ambient --save`
+`typings install dt~github-electron --save --global`
 
-* Under the `typings/` subdirectory, `main` and `browser` type definitions are installed... for working
-  with native Node.js and client-side code respectively.  At first I tried creating a standard
-  `tsconfig.json` file to configure the TypeScript compiler, but it went nuts because `main` and `browser`
-  contain a lot of duplicate definitions.
-
-  * Some online advice suggests adding an `exclude` to your `tsconfig.json`, to resolve the duplicates
-    by forcing TypeScript to ignore either the `main` or `browser` definitions.  That makes sense in a
-    typical project where you are writing native OR browser-based code, but in an Electron project you're
-    doing both.
-
-  * Other online advice suggest structuring your project with separate directories (and separate
-    `tsconfig.json` files) for the main process stuff and the renderer process stuff.  This feels like it
-    might be the best way to go, but setting up a project structure like that is a bit beyond my current
-    NPM and TypeScript experience level.  Feedback and suggestions in this area would be especially
-    appreciated.
-
-  * Ultimately, I ended up eliminating the `tsconfig.json` file *altogether*... and tweaking the
-    `package.json` scripts so that NPM runs the `tsc` compiler on `main.ts` and `renderer.ts` separately.
-    This requires putting three-slash directives at the top of both TypeScript files, telling them
-    which definitions file to reference.
-
-* I experimented with different types of `import` statements to pull Electron and Node modules into my
-  TypeScript files.  Ultimately, what worked is the usual `let electron = require("electron")` statement
-  seen in vanilla JavaScript projects.  It works, but I have no idea how TypeScript knows what's going
-  on... or why I'm able to reference Node.js globals such as `process` or `__dirname` in the main process
-  without any Node.js import statements.
+`typings install dt~node --save --global`
 
