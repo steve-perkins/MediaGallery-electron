@@ -47,13 +47,15 @@ window.onkeydown = (event) => {
   renderCurrentFile();
 };
 
-// Implement a load file event, from either the main process or the renderer process.
+// Implement a load file event, from either the main process or the renderer process.  Validate the selected 
+// file, then find all supported files in the same directory.  Results will be stored in the top-level "filepaths" 
+// array, with the originally-selected file at index 0.
 function loadFile(filepath : string) {
   console.log(`Opening file: ${filepath}`);
   if (!filepath) return;
 
   fs.stat(filepath, (err, stats) => {
-    // Validate the selected file
+    // Validate 
     if (err) {
       console.log(err);
       return;
@@ -69,7 +71,7 @@ function loadFile(filepath : string) {
       return;
     }
 
-    // Find all supported files within the same directory, storing the selected file at the front of the list
+    // Find all supported files
     let allFiles : string[] = [];
     allFiles.push(filepath);
     let dirname = path.dirname(filepath);
@@ -102,30 +104,51 @@ function renderCurrentFile() {
     return;
   }
   let currentFile = filepaths[currentIndex];
-  document.title = `MediaGallery - ${currentFile}`;
-  let contentDiv = document.getElementById("content");
-  let url = `file://${currentFile}`;  // let url = nativeImage.createFromPath(currentFile).toDataURL();
   let ext = path.extname(currentFile).toLowerCase();
   if ([".jpg", ".gif", ".png"].indexOf(ext) != -1) {
-    console.log(`Rendering ${currentFile} as image`);
-
-    contentDiv.innerHTML = `<img src="${url}"/>`;
-
+    renderImage(currentFile);
   } else if ([".mpg", ".mpeg", ".mp4"].indexOf(ext) != -1) {
-    console.log(`Rendering ${currentFile} as video`);
-
-    contentDiv.innerHTML = `<video id="video" controls><source src="${url}"/></video>`;
-    let video : HTMLVideoElement = <HTMLVideoElement> document.getElementById("video");
-    video.addEventListener("loadedmetadata", function (event) {
-      if (video.videoHeight > window.innerHeight && video.videoWidth > window.innerWidth) {
-        video.height = window.innerHeight;
-        video.width = window.innerWidth;
-      } else if (video.videoHeight > window.innerHeight) {
-        video.height = window.innerHeight;
-      } else if (video.videoWidth > window.innerWidth) {
-        video.width = window.innerWidth;
-      }
-    }, false);
+    renderVideo(currentFile);
   }
+}
+
+// TODO: Account for aspect ratio when downsizing to fit window
+function renderImage(filename : string) {
+  console.log(`Rendering ${filename} as image`);
+  document.title = `MediaGallery - ${filename}`;
+  let url = `file://${filename}`;  // let url = nativeImage.createFromPath(filename).toDataURL();
+  let contentDiv = document.getElementById("content");
+  contentDiv.innerHTML = `<img id="image" src="${url}"/>`;
+  let image : HTMLImageElement = <HTMLImageElement> document.getElementById("image");
+  image.addEventListener("load", function () {
+    if (image.naturalHeight > window.innerHeight && image.naturalWidth > window.innerWidth) {
+      image.height = window.innerHeight;
+      image.width = window.innerWidth;
+    } else if (image.naturalHeight > window.innerHeight) {
+      image.height = window.innerHeight;
+    } else if (image.naturalWidth > window.innerWidth) {
+      image.width = window.innerWidth;
+    }
+  }, false);
+}
+
+// TODO: Account for aspect ratio when downsizing to fit window
+function renderVideo(filename : string) {
+  console.log(`Rendering ${filename} as video`);
+  document.title = `MediaGallery - ${filename}`;
+  let url = `file://${filename}`;
+  let contentDiv = document.getElementById("content");
+  contentDiv.innerHTML = `<video id="video" controls><source src="${url}"/></video>`;
+  let video : HTMLVideoElement = <HTMLVideoElement> document.getElementById("video");
+  video.addEventListener("loadedmetadata", function () {
+    if (video.videoHeight > window.innerHeight && video.videoWidth > window.innerWidth) {
+      video.height = window.innerHeight;
+      video.width = window.innerWidth;
+    } else if (video.videoHeight > window.innerHeight) {
+      video.height = window.innerHeight;
+    } else if (video.videoWidth > window.innerWidth) {
+      video.width = window.innerWidth;
+    }
+  }, false);
 }
 
