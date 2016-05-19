@@ -103,18 +103,29 @@ function renderCurrentFile() {
   }
   let currentFile = filepaths[currentIndex];
   document.title = `MediaGallery - ${currentFile}`;
+  let contentDiv = document.getElementById("content");
+  let url = `file://${currentFile}`;  // let url = nativeImage.createFromPath(currentFile).toDataURL();
   let ext = path.extname(currentFile).toLowerCase();
   if ([".jpg", ".gif", ".png"].indexOf(ext) != -1) {
     console.log(`Rendering ${currentFile} as image`);
-    // let imageUrl = nativeImage.createFromPath(currentFile).toDataURL();
-    let imageUrl = `file://${currentFile}`;
-    let contentDiv = document.getElementById("content");
-    contentDiv.innerHTML = `<img src="${imageUrl}"/>`;
+
+    contentDiv.innerHTML = `<img src="${url}"/>`;
 
   } else if ([".mpg", ".mpeg", ".mp4"].indexOf(ext) != -1) {
     console.log(`Rendering ${currentFile} as video`);
-    // TODO: Implement
 
+    contentDiv.innerHTML = `<video id="video" controls><source src="${url}"/></video>`;
+    let video : HTMLVideoElement = <HTMLVideoElement> document.getElementById("video");
+    video.addEventListener("loadedmetadata", function (event) {
+      if (video.videoHeight > window.innerHeight && video.videoWidth > window.innerWidth) {
+        video.height = window.innerHeight;
+        video.width = window.innerWidth;
+      } else if (video.videoHeight > window.innerHeight) {
+        video.height = window.innerHeight;
+      } else if (video.videoWidth > window.innerWidth) {
+        video.width = window.innerWidth;
+      }
+    }, false);
   }
 }
 
