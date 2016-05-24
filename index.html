@@ -4,16 +4,28 @@
     <meta charset="UTF-8">
     <title>MediaGallery</title>
     <style>
-      #content {
-        height: 100%;
+      body {
         margin: 0;
         padding: 0;
-        border: 0;
+      }
+      #content {
+        height: 100vh;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+      }
+      #image #video {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0;
+        padding: 0;
       }
     </style>
   </head>
   <body>
-  <div id="content"></div>
+    <div id="content"></div>
   </body>
 
   <script>

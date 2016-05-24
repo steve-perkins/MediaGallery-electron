@@ -112,7 +112,6 @@ function renderCurrentFile() {
   }
 }
 
-// TODO: Account for aspect ratio when downsizing to fit window
 function renderImage(filename : string) {
   console.log(`Rendering ${filename} as image`);
   document.title = `MediaGallery - ${filename}`;
@@ -121,33 +120,26 @@ function renderImage(filename : string) {
   contentDiv.innerHTML = `<img id="image" src="${url}"/>`;
   let image : HTMLImageElement = <HTMLImageElement> document.getElementById("image");
   image.addEventListener("load", function () {
-    if (image.naturalHeight > window.innerHeight && image.naturalWidth > window.innerWidth) {
-      image.height = window.innerHeight;
-      image.width = window.innerWidth;
-    } else if (image.naturalHeight > window.innerHeight) {
-      image.height = window.innerHeight;
-    } else if (image.naturalWidth > window.innerWidth) {
-      image.width = window.innerWidth;
+    if (image.naturalWidth / contentDiv.clientWidth > image.naturalHeight / contentDiv.clientHeight) {
+      image.style.width = "99%";
+    } else {
+      image.style.height = "99%";
     }
   }, false);
 }
 
-// TODO: Account for aspect ratio when downsizing to fit window
 function renderVideo(filename : string) {
   console.log(`Rendering ${filename} as video`);
   document.title = `MediaGallery - ${filename}`;
   let url = `file://${filename}`;
   let contentDiv = document.getElementById("content");
-  contentDiv.innerHTML = `<video id="video" controls><source src="${url}"/></video>`;
+  contentDiv.innerHTML = `<video id="video" src="${url}" controls/>`;
   let video : HTMLVideoElement = <HTMLVideoElement> document.getElementById("video");
   video.addEventListener("loadedmetadata", function () {
-    if (video.videoHeight > window.innerHeight && video.videoWidth > window.innerWidth) {
-      video.height = window.innerHeight;
-      video.width = window.innerWidth;
-    } else if (video.videoHeight > window.innerHeight) {
-      video.height = window.innerHeight;
-    } else if (video.videoWidth > window.innerWidth) {
-      video.width = window.innerWidth;
+    if (video.videoWidth / contentDiv.clientWidth > video.videoHeight / contentDiv.clientHeight) {
+      video.style.width = "99%";
+    } else {
+      video.style.height = "99%";
     }
   }, false);
 }
