@@ -1,5 +1,7 @@
 MediaGallery
 ============
+> NOTE: Primary development is hosted on GitLab:  https://gitlab.com/steve-perkins/MediaGallery.  If you're
+> reading this on GitHub, then note that this repo is a mirror which can sometimes be slightly out of date.
 
 A simple media viewer desktop application, written to explore [Electron](http://electron.atom.io/) and
 [TypeScript](http://www.typescriptlang.org/) development.  When complete, this app will support:
@@ -36,7 +38,7 @@ If you don't already have TypeScript installed as a global NPM package, then run
 
 Now start by cloning this Git repository:
 
-`git clone https://github.com/steve-perkins/MediaGallery.git`
+`git clone https://gitlab.com/steve-perkins/MediaGallery.git`
 
 ... and running the following command from the project root directory:
 
