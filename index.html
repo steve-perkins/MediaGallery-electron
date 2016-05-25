@@ -4,28 +4,45 @@
     <meta charset="UTF-8">
     <title>MediaGallery</title>
     <style>
-      body {
+      html, body {
+        height: 100%;
         margin: 0;
         padding: 0;
       }
       #content {
-        height: 100vh;
+        height: calc(100% - 22px);
         width: 100%;
         margin: 0;
         padding: 0;
         text-align: center;
       }
-      #image #video {
+      #image, #video {
         position: relative;
         top: 50%;
         transform: translateY(-50%);
         margin: 0;
         padding: 0;
+        max-height: 100%;
+        max-width: 100%;
+      }
+      body > footer {
+        position: fixed;
+        bottom: 0;
+        height: 20px;
+        width: 100%;
+        border-top: 2px solid black;
+      }
+      #status {
+        margin: 0 0 0 10px;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
       }
     </style>
   </head>
   <body>
     <div id="content"></div>
+    <footer><span id="status"/></footer>
   </body>
 
   <script>

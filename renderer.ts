@@ -43,15 +43,24 @@ window.onkeydown = (event) => {
     // Navigate backward through the gallery upon left-arrow or up-arrow keypress
     currentIndex = (currentIndex == 0) ? filepaths.length - 1 : currentIndex - 1;
   }
-  console.log(`Loading media at index position ${currentIndex}, ${filepaths[currentIndex].toString()}`);
+  // console.log(`Loading media at index position ${currentIndex}, ${filepaths[currentIndex].toString()}`);
   renderCurrentFile();
+};
+
+// TODO: Document
+window.onresize = (event) => {
+  if (document.getElementById("image")) {
+    resizeImage();
+  } else if (document.getElementById("video")) {
+    resizeVideo();
+  }
 };
 
 // Implement a load file event, from either the main process or the renderer process.  Validate the selected 
 // file, then find all supported files in the same directory.  Results will be stored in the top-level "filepaths" 
 // array, with the originally-selected file at index 0.
 function loadFile(filepath : string) {
-  console.log(`Opening file: ${filepath}`);
+  // console.log(`Opening file: ${filepath}`);
   if (!filepath) return;
 
   fs.stat(filepath, (err, stats) => {
@@ -88,7 +97,6 @@ function loadFile(filepath : string) {
           allFiles.push(fullPath);
         }
       }
-      console.log(`Found ${allFiles.length} supported files in this directory`);
       filepaths = allFiles.slice(0);
       currentIndex = 0;
       renderCurrentFile();
@@ -110,37 +118,50 @@ function renderCurrentFile() {
   } else if ([".mpg", ".mpeg", ".mp4"].indexOf(ext) != -1) {
     renderVideo(currentFile);
   }
+  let statusSpan : HTMLSpanElement = document.getElementById("status");
+  statusSpan.innerHTML = `${currentIndex + 1} / ${filepaths.length}`;
 }
 
+// TODO: Document
 function renderImage(filename : string) {
-  console.log(`Rendering ${filename} as image`);
   document.title = `MediaGallery - ${filename}`;
   let url = `file://${filename}`;  // let url = nativeImage.createFromPath(filename).toDataURL();
   let contentDiv = document.getElementById("content");
   contentDiv.innerHTML = `<img id="image" src="${url}"/>`;
   let image : HTMLImageElement = <HTMLImageElement> document.getElementById("image");
-  image.addEventListener("load", function () {
-    if (image.naturalWidth / contentDiv.clientWidth > image.naturalHeight / contentDiv.clientHeight) {
-      image.style.width = "99%";
-    } else {
-      image.style.height = "99%";
-    }
-  }, false);
+  image.addEventListener("load", resizeImage, false);
 }
 
+// TODO: Document
 function renderVideo(filename : string) {
-  console.log(`Rendering ${filename} as video`);
   document.title = `MediaGallery - ${filename}`;
   let url = `file://${filename}`;
   let contentDiv = document.getElementById("content");
   contentDiv.innerHTML = `<video id="video" src="${url}" controls/>`;
   let video : HTMLVideoElement = <HTMLVideoElement> document.getElementById("video");
-  video.addEventListener("loadedmetadata", function () {
-    if (video.videoWidth / contentDiv.clientWidth > video.videoHeight / contentDiv.clientHeight) {
-      video.style.width = "99%";
-    } else {
-      video.style.height = "99%";
-    }
-  }, false);
+  video.addEventListener("loadedmetadata", resizeVideo, false);
 }
 
+// TODO: Document
+function resizeImage() {
+  let contentDiv = document.getElementById("content");
+  let image : HTMLImageElement = <HTMLImageElement> document.getElementById("image");
+  image.style.width = image.style.height = null;
+  if (image.naturalWidth / contentDiv.clientWidth > image.naturalHeight / contentDiv.clientHeight) {
+    image.style.width = "100%";
+  } else {
+    image.style.height = "100%";
+  }
+}
+
+// TODO: Document
+function resizeVideo() {
+  let contentDiv = document.getElementById("content");
+  let video : HTMLVideoElement = <HTMLVideoElement> document.getElementById("video");
+  video.style.width = video.style.height = null;
+  if (video.videoWidth / contentDiv.clientWidth > video.videoHeight / contentDiv.clientHeight) {
+    video.style.width = "100%";
+  } else {
+    video.style.height = "100%";
+  }
+}
