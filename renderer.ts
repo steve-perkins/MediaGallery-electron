@@ -139,7 +139,18 @@ function renderVideo(filename : string) {
   let contentDiv = document.getElementById("content");
   contentDiv.innerHTML = `<video id="video" src="${url}" controls/>`;
   let video : HTMLVideoElement = <HTMLVideoElement> document.getElementById("video");
-  video.addEventListener("loadedmetadata", resizeVideo, false);
+  video.addEventListener("loadedmetadata", () => {
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+      console.log(`Skipping unplayable video: ${filename}`);
+      filepaths.splice(filepaths.indexOf(filename), 1);
+      if (currentIndex >= filepaths.length) {
+        currentIndex = 0;
+      }
+      renderCurrentFile();
+    } else {
+      resizeVideo();
+    }
+  }, false);
 }
 
 // TODO: Document
