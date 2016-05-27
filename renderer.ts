@@ -4,11 +4,16 @@ let ipcRenderer = electron.ipcRenderer;
 let fs = require("fs");
 let path = require("path");
 
+const imageExtensions = [".jpg", ".gif", ".png"];
+const videoExtensions = [".mpg", ".mpeg", ".mp4", ".webm"];
+const supportedExtensions = imageExtensions.concat(videoExtensions);
+
 // All supported files (full absolute paths) in the same directory as the last file explicitly opened
 // by the user.  The explicitly-opened file will be at index position 0 in the array.  "currentIndex"
 // represents the array index of the file currently rendered on the screen.
 let filepaths : string[] = [];
 let currentIndex = 0;
+let pendingVideos : HTMLVideoElement[] = [];
 
 // Receive log messages from the main process, which cannot access the dev tools console directly.
 ipcRenderer.on("send-console", (event, arg) => {
@@ -60,51 +65,93 @@ window.onresize = (event) => {
 // file, then find all supported files in the same directory.  Results will be stored in the top-level "filepaths" 
 // array, with the originally-selected file at index 0.
 function loadFile(filepath : string) {
-  // console.log(`Opening file: ${filepath}`);
   if (!filepath) return;
+  let ext = path.extname(filepath).toLowerCase();
 
-  fs.stat(filepath, (err, stats) => {
-    // Validate 
-    if (err) {
-      console.log(err);
-      return;
-    }
-    if (!stats.isFile()) {
-      console.log(`${filepath} cannot be opened`);
-      return;
-    }
-    let supportedExtensions = [".jpg", ".gif", ".png", ".mpg", ".mpeg", ".mp4"];
-    let ext = path.extname(filepath).toLowerCase();
-    if (supportedExtensions.indexOf(ext) === -1) {
-      console.log(`${filepath} is not a supported file type`);
-      return;
+  // Validate that the file is accessible and has a supported file extension.
+  let stats = fs.statSync(filepath);
+  if (!stats || !stats.isFile()) {
+    console.log(`${filepath} does not exist or cannot be opened.`);
+    return
+  }
+  if (supportedExtensions.indexOf(ext) === -1) {
+    console.log(`${filepath} is not a supported file type`);
+    return;
+  }
+
+  // If the file is a video, then verify that it's playable.  If its dimensions are 0x0 pixels, then that suggests
+  // an unsupported codec.
+  new Promise((resolve, reject) => {
+    if (videoExtensions.indexOf(ext) === -1) {
+      resolve();
+    } else {
+      let video : HTMLVideoElement = <HTMLVideoElement> document.createElement("video");
+      video.src = filepath;
+      video.addEventListener("loadedmetadata", () => {
+        console.log(`Found ${video.videoWidth}x${video.videoHeight} for ${filepath}`);
+        if (video.videoWidth === 0 || video.videoHeight === 0) {
+          reject(new Error("Unplayable video"));
+        } else {
+          resolve();
+        }
+      }, false);
     }
 
-    // Find all supported files
-    let allFiles : string[] = [];
-    allFiles.push(filepath);
+  // Find all other supported files in the same directory.
+  }).then( () => {
+    filepaths = [];
+    filepaths.push(filepath);
+    currentIndex = 0;
+    pendingVideos = [];
+
     let dirname = path.dirname(filepath);
     fs.readdir(dirname, (err, files : string[]) => {
       if (err) {
         console.log(err);
         return;
       }
+      // let videoChecks = [];
+      // videoChecks.push(Promise.resolve());
       for (let file of files) {
-        let ext = path.extname(file).toLowerCase();
-        if (supportedExtensions.indexOf(ext) === -1) continue;
+
+        // Add images to the valid list right away
         let fullPath = path.join(dirname, file);
-        if (allFiles.indexOf(fullPath) === -1) {
-          allFiles.push(fullPath);
+        if (filepaths.indexOf(fullPath) === -1) {
+          let ext = path.extname(file).toLowerCase();
+          if (imageExtensions.indexOf(ext) !== -1) {
+            filepaths.push(fullPath);
+          } else if (videoExtensions.indexOf(ext) !== -1) {
+
+            // Asynchronously check videos, and add them to the list after each one checks out.
+            // let videoCheck = new Promise((resolve, reject) => {
+              let video : HTMLVideoElement = <HTMLVideoElement> document.createElement("video");
+              video.src = filepath;
+              video.addEventListener("loadedmetadata", () => {
+                console.log(`Found ${video.videoWidth}x${video.videoHeight} for ${filepath}`);
+                if (video.videoWidth !== 0 && video.videoHeight !== 0) {
+                  filepaths.push(file);
+                  let statusSpan : HTMLSpanElement = document.getElementById("status");
+                  statusSpan.innerHTML = `${currentIndex + 1} / ${filepaths.length}`;
+                }
+              }, false);
+              video.load();
+            pendingVideos.push(video);
+            // });
+            // videoChecks.push(videoCheck);
+          }
         }
       }
-      filepaths = allFiles.slice(0);
-      currentIndex = 0;
+      // Promise.all(videoChecks).then( () => {
+        // renderCurrentFile();
+      // }).catch((err) => { console.log(err); });
       renderCurrentFile();
-    })
+    });
+  }).catch( (err) => {
+    console.log(err);
   });
 }
 
-// Render the current file (i.e. "filepaths[currentIndex]") to the screen, as either an image or 
+// Render the current file (i.e. "filepaths[currentIndex]") to the screen, as either an image or
 // a video.  This function is called by "loadFile()" when the user explicitly opens an image, 
 // or by the arrow key event handler when the user cycles through the gallery with arrow keys.
 function renderCurrentFile() {
