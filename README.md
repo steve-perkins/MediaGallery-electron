@@ -1,6 +1,6 @@
 MediaGallery
 ============
-> NOTE: Primary development is hosted on GitLab:  https://gitlab.com/steve-perkins/MediaGallery.  If you're
+> NOTE: Primary development is hosted on GitLab:  https://gitlab.com/steve-perkins/MediaGallery-electron.  If you're
 > reading this on GitHub, then note that this repo is a mirror which can sometimes be slightly out of date.
 
 A simple media viewer desktop application, written to explore [Electron](http://electron.atom.io/) and
