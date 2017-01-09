@@ -4,11 +4,11 @@
   "description": "An Electron-based image and video viewer",
   "main": "main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p ./",
     "prestart": "npm run build",
     "start": "electron main.js",
-    "dist-win32-x64": "npm run build && electron-packager . --out=dist --platform=win32 --arch=x64 --overwrite",
-    "dist-all": "npm run build && electron-packager . --out=dist --platform=all --arch=all --overwrite"
+    "dist-win32-x64": "npm run build && electron . --out=dist --platform=win32 --arch=x64 --overwrite",
+    "dist-all": "npm run build && electron . --out=dist --platform=all --arch=all --overwrite"
   },
   "repository": {
     "type": "git",
@@ -22,7 +22,9 @@
   },
   "homepage": "",
   "devDependencies": {
-    "electron-prebuilt": "^1.0.1",
-    "electron-packager": "^7.0.1"
+    "@types/electron": "^1.4.31",
+    "@types/node": "^6.0.58",
+    "electron": "^1.4.13",
+    "electron-prebuilt": "^1.4.13"
   }
 }

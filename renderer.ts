@@ -1,8 +1,7 @@
-/// <reference path="typings/index.d.ts" />
 import electron = require("electron");
 let ipcRenderer = electron.ipcRenderer;
-let fs = require("fs");
-let path = require("path");
+import fs = require("fs");
+import path = require("path");
 
 // All supported files (full absolute paths) in the same directory as the last file explicitly opened
 // by the user.  The explicitly-opened file will be at index position 0 in the array.  "currentIndex"
