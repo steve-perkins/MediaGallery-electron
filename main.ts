@@ -1,4 +1,3 @@
-/// <reference path="typings/index.d.ts" />
 import electron = require("electron");
 let app = electron.app;
 let dialog = electron.dialog;
